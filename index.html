@@ -144,12 +144,9 @@
         <a href="https://www.bilibili.com/video/BV1tfNo6oEyD/" target="_blank" rel="noopener">B 站 · 巡演周边</a>
       </p>
       <div class="table-wrap">
-        <table class="data-table">
+        <table class="data-table benefits-table">
           <colgroup>
-            <col class="col-benefit">
-            <col class="col-ticket">
-            <col class="col-ticket">
-            <col class="col-ticket">
+            <col span="4">
           </colgroup>
           <thead>
             <tr>
@@ -217,20 +214,29 @@
           <li>在扶梯旁「排队」区域等候，上扶梯后右转</li>
           <li>到达 MAO Livehouse 广州中大店（二号馆）入口</li>
         </ol>
-        <div class="venue-guide-grid">
-          <figure class="guide-figure">
-            <img src="images/venue/zhongda/01-corridor-to-escalator.jpg" alt="沿通道前行，上扶梯到达三楼" width="720" height="960" loading="lazy">
-            <figcaption>① 上扶梯，到达三楼</figcaption>
-          </figure>
-          <figure class="guide-figure">
-            <img src="images/venue/zhongda/02-escalator-turn-right.jpg" alt="在排队区域等候，上扶梯后右转" width="720" height="960" loading="lazy">
-            <figcaption>② 排队 · 上扶梯后右转</figcaption>
-          </figure>
-          <figure class="guide-figure">
-            <img src="images/venue/zhongda/03-venue-entrance.jpg" alt="MAO Livehouse 广州中大店二号馆入口" width="720" height="960" loading="lazy">
-            <figcaption>③ 到达目的地</figcaption>
-          </figure>
-        </div>
+        <details class="venue-guide-collapse">
+          <summary class="venue-guide-toggle">展开查看路线图片（3 张）</summary>
+          <div class="venue-guide-grid">
+            <figure class="guide-figure">
+              <button type="button" class="guide-image-btn" data-caption="① 上扶梯，到达三楼">
+                <img src="images/venue/zhongda/01-corridor-to-escalator.jpg" alt="沿通道前行，上扶梯到达三楼" width="720" height="960" loading="lazy">
+              </button>
+              <figcaption>① 上扶梯，到达三楼</figcaption>
+            </figure>
+            <figure class="guide-figure">
+              <button type="button" class="guide-image-btn" data-caption="② 排队 · 上扶梯后右转">
+                <img src="images/venue/zhongda/02-escalator-turn-right.jpg" alt="在排队区域等候，上扶梯后右转" width="720" height="960" loading="lazy">
+              </button>
+              <figcaption>② 排队 · 上扶梯后右转</figcaption>
+            </figure>
+            <figure class="guide-figure">
+              <button type="button" class="guide-image-btn" data-caption="③ 到达目的地">
+                <img src="images/venue/zhongda/03-venue-entrance.jpg" alt="MAO Livehouse 广州中大店二号馆入口" width="720" height="960" loading="lazy">
+              </button>
+              <figcaption>③ 到达目的地</figcaption>
+            </figure>
+          </div>
+        </details>
       </div>
 
       <div class="guide-block">
@@ -381,6 +387,15 @@
   </footer>
 
   <div class="share-toast" id="share-toast" role="status" aria-live="polite" hidden></div>
+
+  <div class="lightbox" id="image-lightbox" hidden aria-hidden="true">
+    <button type="button" class="lightbox-backdrop" aria-label="关闭预览"></button>
+    <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-labelledby="lightbox-caption">
+      <button type="button" class="lightbox-close" aria-label="关闭">×</button>
+      <img class="lightbox-img" src="" alt="">
+      <p class="lightbox-caption" id="lightbox-caption"></p>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
