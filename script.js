@@ -85,6 +85,61 @@ document.querySelectorAll('.btn-share-site').forEach((btn) => {
   btn.addEventListener('click', shareSite);
 });
 
+function loadHtml2Canvas() {
+  if (window.html2canvas) {
+    return Promise.resolve(window.html2canvas);
+  }
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    script.async = true;
+    script.onload = () => resolve(window.html2canvas);
+    script.onerror = () => reject(new Error('html2canvas load failed'));
+    document.head.appendChild(script);
+  });
+}
+
+async function exportHeroImage() {
+  const target = document.querySelector('.hero');
+  if (!target) return;
+
+  const buttons = document.querySelectorAll('.btn-export-image');
+  buttons.forEach((btn) => {
+    btn.disabled = true;
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = '生成中…';
+  });
+
+  try {
+    const html2canvas = await loadHtml2Canvas();
+    const canvas = await html2canvas(target, {
+      backgroundColor: '#0f1419',
+      scale: Math.min(window.devicePixelRatio || 1, 2),
+      useCORS: true,
+      logging: false,
+    });
+
+    const link = document.createElement('a');
+    link.download = 'yuzibei-guangzhou-2026.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showShareToast('海报已保存到相册/下载文件夹');
+  } catch {
+    showShareToast('导出失败，请稍后重试');
+  } finally {
+    buttons.forEach((btn) => {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.originalText || '导出图片';
+      delete btn.dataset.originalText;
+    });
+  }
+}
+
+document.querySelectorAll('.btn-export-image').forEach((btn) => {
+  btn.addEventListener('click', exportHeroImage);
+});
+
 document.querySelectorAll('.btn-copy-address').forEach((btn) => {
   btn.addEventListener('click', async () => {
     const text = btn.dataset.copy;
