@@ -56,11 +56,15 @@ function showShareToast(message) {
 const SHARE_TITLE = '于梓贝「夏日出逃之必要」广州站';
 const SHARE_TEXT = '8/29 中大店 · 8/30 太古仓加场 · 购票、观演指南与歌单';
 
+function canUseNativeShare() {
+  return Boolean(navigator.share && window.isSecureContext && window.location.protocol !== 'file:');
+}
+
 async function shareSite() {
   const url = window.location.href;
   const isLocalFile = window.location.protocol === 'file:';
 
-  if (navigator.share && !isLocalFile) {
+  if (canUseNativeShare()) {
     try {
       await navigator.share({
         title: SHARE_TITLE,
@@ -75,7 +79,13 @@ async function shareSite() {
 
   try {
     await copyText(isLocalFile ? `${SHARE_TITLE}\n${SHARE_TEXT}` : url);
-    showShareToast(isLocalFile ? '本地预览无法生成链接，已复制简介' : '链接已复制，快去分享吧');
+    let message = '链接已复制，快去分享吧';
+    if (isLocalFile) {
+      message = '本地预览无法生成链接，已复制简介';
+    } else if (!window.isSecureContext) {
+      message = 'HTTP 无法调用系统分享，链接已复制；备案后开 HTTPS 即可与 GitHub 一样分享';
+    }
+    showShareToast(message);
   } catch {
     showShareToast('复制失败，请手动复制地址栏链接');
   }
@@ -100,10 +110,29 @@ function loadHtml2Canvas() {
   });
 }
 
-async function exportHeroImage() {
-  const target = document.querySelector('.hero');
-  if (!target) return;
+function prepareExportClone(doc) {
+  const pageHeight = document.documentElement.scrollHeight;
+  const pageWidth = document.documentElement.scrollWidth;
 
+  doc.documentElement.style.height = `${pageHeight}px`;
+  doc.body.style.minHeight = `${pageHeight}px`;
+
+  const toast = doc.getElementById('share-toast');
+  if (toast) toast.hidden = true;
+
+  doc.querySelectorAll('.bg-gradient, .bg-orbs').forEach((el) => {
+    el.style.position = 'absolute';
+    el.style.inset = 'auto';
+    el.style.top = '0';
+    el.style.left = '0';
+    el.style.width = `${pageWidth}px`;
+    el.style.height = `${pageHeight}px`;
+  });
+
+  doc.querySelector('.site-header')?.style.setProperty('position', 'relative');
+}
+
+async function exportPageImage() {
   const buttons = document.querySelectorAll('.btn-export-image');
   buttons.forEach((btn) => {
     btn.disabled = true;
@@ -111,33 +140,53 @@ async function exportHeroImage() {
     btn.textContent = '生成中…';
   });
 
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
+
   try {
     const html2canvas = await loadHtml2Canvas();
-    const canvas = await html2canvas(target, {
+    window.scrollTo(0, 0);
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+
+    const pageWidth = document.documentElement.scrollWidth;
+    const pageHeight = document.documentElement.scrollHeight;
+    const scale = Math.min(window.devicePixelRatio || 1, 2);
+
+    const canvas = await html2canvas(document.body, {
       backgroundColor: '#0f1419',
-      scale: Math.min(window.devicePixelRatio || 1, 2),
+      scale,
       useCORS: true,
       logging: false,
+      width: pageWidth,
+      height: pageHeight,
+      windowWidth: pageWidth,
+      windowHeight: pageHeight,
+      scrollX: 0,
+      scrollY: 0,
+      onclone: prepareExportClone,
     });
 
     const link = document.createElement('a');
-    link.download = 'yuzibei-guangzhou-2026.png';
+    link.download = 'yuzibei-guangzhou-2026-full.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
-    showShareToast('海报已保存到相册/下载文件夹');
+    showShareToast('长图已保存到相册/下载文件夹');
   } catch {
     showShareToast('导出失败，请稍后重试');
   } finally {
+    window.scrollTo(scrollX, scrollY);
     buttons.forEach((btn) => {
       btn.disabled = false;
-      btn.textContent = btn.dataset.originalText || '导出图片';
+      btn.textContent = btn.dataset.originalText || '导出长图';
       delete btn.dataset.originalText;
     });
   }
 }
 
 document.querySelectorAll('.btn-export-image').forEach((btn) => {
-  btn.addEventListener('click', exportHeroImage);
+  btn.addEventListener('click', exportPageImage);
 });
 
 document.querySelectorAll('.btn-copy-address').forEach((btn) => {
