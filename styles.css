@@ -1003,6 +1003,21 @@ main {
   text-decoration: underline;
 }
 
+.footer-beian {
+  margin-top: 0.75rem;
+  font-size: 0.78rem;
+}
+
+.footer-beian a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.footer-beian a:hover {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
 @media (max-width: 600px) {
   .hero {
     padding: 2.5rem 0 2rem;
